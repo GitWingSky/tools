@@ -179,7 +179,7 @@ function getUserInfo() {
         var repair_num = res.data.user.repair_num;
         var next_level_num = res.data.user.next_level_num;
         if (repair_num > next_level_num) {
-            upgradeUserLevel();
+            //upgradeUserLevel();
         }
         console.log(`修为点` + repair_num);
         console.log(`当前体力` + res.data.user.health_num);
@@ -205,21 +205,19 @@ function getUserGoods() {
                 if (goods.name === '红药水') {
                     useGoodsToUser(res.data[i]._id);
                     redFlag = false;
-                    break;
                 }
-            }
-
-            if (goods.name.indexOf("鉴") > -1 ) {
-                var sell_jsons = []
-                var sell_json = {}
-                sell_json["id"] = res.data[i]._id
-                sell_json["count"] = res.data[i].count + ""
-                sell_json["name"] = goods.name
-                sell_json["style"] = goods.style
-                sell_jsons.push(sell_json)
-                var json = JSON.stringify(sell_jsons)
-                console.log("出售：" + goods.name + "," + res.data[i].count + "件")
-                sellGoods(json)
+                if (goods.name.indexOf("鉴") > -1) {
+                    var sell_jsons = []
+                    var sell_json = {}
+                    sell_json["id"] = res.data[i]._id
+                    sell_json["count"] = res.data[i].count + ""
+                    sell_json["name"] = goods.name
+                    sell_json["style"] = goods.style
+                    sell_jsons.push(sell_json)
+                    var json = JSON.stringify(sell_jsons)
+                    console.log("出售：" + goods.name + "," + res.data[i].count + "件")
+                    //sellGoods(json)
+                }
             }
         }
         if(redFlag){
