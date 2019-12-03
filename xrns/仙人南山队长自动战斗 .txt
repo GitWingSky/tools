@@ -1,4 +1,4 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name         仙人南山自动战斗
 // @namespace    https://blog.wingsky.net/
 // @version      0.1
@@ -7,6 +7,8 @@
 // @match        https://xrns.ngame.io/
 // @grant        none
 // ==/UserScript==
+
+var cookie = '';
 
 (function() {
     if(!window.localStorage){
@@ -44,6 +46,18 @@
     stop.style.top="200px";
     stop.style.zIndex="10000";
 
+    var startAuto = document.createElement("P");
+    startAuto.appendChild(document.createTextNode("自动吃药"));
+    startAuto.style.lineheight="50px";
+    startAuto.style.color="white";
+    startAuto.style.fontSize="30px";
+    startAuto.style.padding="10px 20px";
+    startAuto.style.background="blue";
+    startAuto.style.position="fixed";
+    startAuto.style.right="30px";
+    startAuto.style.top="300px";
+    startAuto.style.zIndex="10000";
+
     var notice = document.createElement("DIV");
     //notice.style.color="white";
     notice.style.background="darkseagreen";
@@ -51,7 +65,7 @@
     notice.style.padding="10px 20px";
     notice.style.position="fixed";
     notice.style.right="30px";
-    notice.style.top="300px";
+    notice.style.top="400px";
     notice.style.lineheight="30px";
     notice.style.zIndex = "10000";
     notice.style.width = "300px";
@@ -83,6 +97,7 @@
     var container = document.querySelector('body');
     container.appendChild(start);
     container.appendChild(stop);
+    container.appendChild(startAuto);
     container.appendChild(notice);
 
     //绑定点击事件
@@ -102,11 +117,13 @@
             if(flag == true){
                 start.style.display="none";
                 stop.style.display="none";
+                startAuto.style.display="none";
                 notice.style.display="none";
                 flag = false;
             }else{
                 start.style.display="";
                 stop.style.display="";
+                startAuto.style.display="";
                 notice.style.display="";
                 flag = true;
             }
@@ -116,17 +133,129 @@
     }
 
     var auto = null;
+
     start.onclick = function() {
         notice_1.innerText = "当前状态：战斗中";
         auto = setInterval(function(){
-            startPerilTeamFunc()
+            startPerilTeamFunc();
         },time)
 
     }
 
     stop.onclick = function() {
        notice_1.innerText = "当前状态：停止中";
-        clearInterval(auto)
+       clearInterval(auto)
+    }
+
+    var autoAuto = null;
+    var startAutoFlag = true;
+    startAuto.onclick = function() {
+        if(startAutoFlag){
+            startAuto.innerText = '自动吃药ing';
+            startAutoFlag = false;
+            autoAuto = setInterval(function(){
+                getUserInfo();
+            },time)
+        }else{
+            startAuto.innerText = '自动吃药';
+            startAutoFlag = true;
+            clearInterval(autoAuto)
+        }
+
     }
 
 })();
+
+//获取当前个人信息
+function getUserInfo() {
+    fetch('https://xrns.ngame.io/api/getUserInfo', {
+        method: "GET",
+        headers: {
+            'Cookie': cookie,
+        },
+    }).then(function (response) {
+        return response.json()
+    }).then(function (res) {
+        var repair_num = res.data.user.repair_num;
+        var next_level_num = res.data.user.next_level_num;
+        if (repair_num > next_level_num) {
+            upgradeUserLevel();
+        }
+        console.log(`修为点` + repair_num);
+        console.log(`当前体力` + res.data.user.health_num);
+        if(res.data.user.health_num<400){
+            getUserGoods();
+        }
+    })
+}
+
+function getUserGoods() {
+    fetch("https://xrns.ngame.io/api/getUserGoods", {
+        method: "GET",
+        headers: {
+            'Cookie': cookie,
+        }
+    }).then(function (response) {
+        return response.json()
+    }).then(function (res) {
+        var redFlag = true;
+        for (var i = 0; i < res.data.length; i++) {
+            if(res.data[i].goods != null){
+                var goods = res.data[i].goods;
+                if (goods.name === '红药水') {
+                    useGoodsToUser(res.data[i]._id);
+                    redFlag = false;
+                    break;
+                }
+            }
+        }
+        if(redFlag){
+             byGoodsToMyUser();
+             getUserGoods();
+        }
+    })
+}
+
+
+// 使用红药水
+function useGoodsToUser(id) {
+    fetch("https://xrns.ngame.io/api/useGoodsToUser", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            'Cookie': cookie,
+        },
+        body: 'ugid=' + id
+    }).then(function (response) {
+    }).then(function () {
+        console.log('体力加100点')
+    })
+}
+
+// 买红药水
+function byGoodsToMyUser() {
+    fetch("https://xrns.ngame.io/api/byGoodsToMyUser", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            'Cookie': cookie,
+        },
+        body: 'gid=5dbfcc8cd9b8c0272471e2bf'
+    }).then(function (response) {
+    }).then(function () {
+    })
+}
+
+//升级
+function upgradeUserLevel() {
+    fetch('https://xrns.ngame.io/api/upgradeUserLevel', {
+        method: "POST",
+        headers: {
+            'Cookie': cookie,
+        },
+    }).then(function (response) {
+        return response.json()
+    }).then(function () {
+        console.log('升级成功');
+    })
+}
