@@ -216,7 +216,7 @@ function getUserGoods() {
                     sell_jsons.push(sell_json)
                     var json = JSON.stringify(sell_jsons)
                     console.log("出售：" + goods.name + "," + res.data[i].count + "件")
-                    //sellGoods(json)
+                    sellGoods(json)
                 }
             }
         }
