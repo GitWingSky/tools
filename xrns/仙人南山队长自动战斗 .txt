@@ -208,6 +208,19 @@ function getUserGoods() {
                     break;
                 }
             }
+
+            if (goods.name.indexOf("鉴") > -1 ) {
+                var sell_jsons = []
+                var sell_json = {}
+                sell_json["id"] = res.data[i]._id
+                sell_json["count"] = res.data[i].count + ""
+                sell_json["name"] = goods.name
+                sell_json["style"] = goods.style
+                sell_jsons.push(sell_json)
+                var json = JSON.stringify(sell_jsons)
+                console.log("出售：" + goods.name + "," + res.data[i].count + "件")
+                sellGoods(json)
+            }
         }
         if(redFlag){
              byGoodsToMyUser();
@@ -257,5 +270,21 @@ function upgradeUserLevel() {
         return response.json()
     }).then(function () {
         console.log('升级成功');
+    })
+}
+
+//卖东西
+function sellGoods(json) {
+    fetch("https://xrns.ngame.io/api/sellGoods", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            'Cookie': cookie,
+        },
+        body: `sell_json=` + json + `&sell_type=wqp`
+    }).then(function (response) {
+        return response.json()
+    }).then(function (res) {
+        console.log(res)
     })
 }
