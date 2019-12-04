@@ -1,9 +1,9 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name         仙人南山自动战斗
 // @namespace    https://blog.wingsky.net/
 // @version      0.1
 // @description  仙人南山自动战斗
-// @author       Kite
+// @author       纸鸢
 // @match        https://xrns.ngame.io/
 // @grant        none
 // ==/UserScript==
@@ -222,7 +222,6 @@ function getUserGoods() {
         }
         if(redFlag){
              byGoodsToMyUser();
-             getUserGoods();
         }
     })
 }
