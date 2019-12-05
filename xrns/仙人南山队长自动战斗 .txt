@@ -190,7 +190,7 @@ function getUserInfo() {
 }
 
 function getUserGoods() {
-    fetch("https://xrns.ngame.io/api/getUserGoods", {
+     fetch("https://xrns.ngame.io/api/getUserGoods", {
         method: "GET",
         headers: {
             'Cookie': cookie,
@@ -198,31 +198,43 @@ function getUserGoods() {
     }).then(function (response) {
         return response.json()
     }).then(function (res) {
-        var redFlag = true;
-        for (var i = 0; i < res.data.length; i++) {
-            if(res.data[i].goods != null){
-                var goods = res.data[i].goods;
-                if (goods.name === '红药水') {
-                    useGoodsToUser(res.data[i]._id);
-                    redFlag = false;
-                }
-                if (goods.name.indexOf("鉴") > -1) {
-                    var sell_jsons = []
-                    var sell_json = {}
-                    sell_json["id"] = res.data[i]._id
-                    sell_json["count"] = res.data[i].count + ""
-                    sell_json["name"] = goods.name
-                    sell_json["style"] = goods.style
-                    sell_jsons.push(sell_json)
-                    var json = JSON.stringify(sell_jsons)
-                    console.log("出售：" + goods.name + "," + res.data[i].count + "件")
-                    sellGoods(json)
-                }
-            }
-        }
-        if(redFlag){
+         var pages = res.pages;
+         var redFlag = true;
+         for(var j = 1; j < pages + 1; j++){
+              fetch("https://xrns.ngame.io/api/getUserGoods?page=" + j, {
+                  method: "GET",
+                  headers: {
+                      'Cookie': cookie,
+                  }
+              }).then(function (response) {
+                  return response.json()
+              }).then(function (res) {
+                  for (var i = 0; i < res.data.length; i++) {
+                      if(res.data[i].goods != null){
+                          var goods = res.data[i].goods;
+                          if (goods.name === '红药水') {
+                              useGoodsToUser(res.data[i]._id);
+                              redFlag = false;
+                          }
+                          if (goods.name.indexOf("鉴") > -1) {
+                              var sell_jsons = []
+                              var sell_json = {}
+                              sell_json["id"] = res.data[i]._id
+                              sell_json["count"] = res.data[i].count + ""
+                              sell_json["name"] = goods.name
+                              sell_json["style"] = goods.style
+                              sell_jsons.push(sell_json)
+                              var json = JSON.stringify(sell_jsons)
+                              console.log("出售：" + goods.name + "," + res.data[i].count + "件")
+                              sellGoods(json)
+                          }
+                      }
+                  }
+              })
+         }
+         if(redFlag){
              byGoodsToMyUser();
-        }
+         }
     })
 }
 
