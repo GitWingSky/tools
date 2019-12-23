@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         仙人南山自动战斗
+// @name         云顶修仙队长自动战斗
 // @namespace    https://blog.wingsky.net/
 // @version      0.1
 // @description  仙人南山自动战斗
