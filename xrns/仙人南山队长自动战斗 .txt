@@ -4,7 +4,7 @@
 // @version      0.1
 // @description  仙人南山自动战斗
 // @author       纸鸢
-// @match        https://xrns.ngame.io/
+// @match        http://joucks.cn:3344/
 // @grant        none
 // ==/UserScript==
 
