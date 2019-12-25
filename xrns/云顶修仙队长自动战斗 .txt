@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         仙人南山自动战斗
+// @name         云顶修仙自动战斗
 // @namespace    https://blog.wingsky.net/
 // @version      0.1
-// @description  仙人南山自动战斗
+// @description  云顶修仙自动战斗
 // @author       纸鸢
 // @match        http://joucks.cn:3344/
 // @grant        none
