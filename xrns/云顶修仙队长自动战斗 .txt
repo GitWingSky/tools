@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         云顶修仙队长自动战斗
+// @name         仙人南山自动战斗
 // @namespace    https://blog.wingsky.net/
 // @version      0.1
-// @description  云顶修仙队长自动战斗
+// @description  仙人南山自动战斗
 // @author       纸鸢
 // @match        http://joucks.cn:3344/
 // @grant        none
@@ -34,18 +34,6 @@ var cookie = '';
     start.style.top="100px";
     start.style.zIndex="10000";
 
-    var stop = document.createElement("P");
-    stop.appendChild(document.createTextNode("停止战斗"));
-    stop.style.lineheight="50px";
-    stop.style.color="white";
-    stop.style.fontSize="30px";
-    stop.style.padding="10px 20px";
-    stop.style.background="black";
-    stop.style.position="fixed";
-    stop.style.right="30px";
-    stop.style.top="200px";
-    stop.style.zIndex="10000";
-
     var startAuto = document.createElement("P");
     startAuto.appendChild(document.createTextNode("自动吃药"));
     startAuto.style.lineheight="50px";
@@ -55,7 +43,7 @@ var cookie = '';
     startAuto.style.background="blue";
     startAuto.style.position="fixed";
     startAuto.style.right="30px";
-    startAuto.style.top="300px";
+    startAuto.style.top="200px";
     startAuto.style.zIndex="10000";
 
     var notice = document.createElement("DIV");
@@ -65,19 +53,17 @@ var cookie = '';
     notice.style.padding="10px 20px";
     notice.style.position="fixed";
     notice.style.right="30px";
-    notice.style.top="400px";
+    notice.style.top="300px";
     notice.style.lineheight="30px";
     notice.style.zIndex = "10000";
     notice.style.width = "300px";
 
     var notice_0 = document.createElement("P");
     notice_0.appendChild(document.createTextNode("Ctrl+Q隐藏/显示"));
-    var notice_1 = document.createElement("P");
-    notice_1.appendChild(document.createTextNode("当前状态：停止中" ));
     var notice_2 = document.createElement("P");
     notice_2.appendChild(document.createTextNode("当前时间间隔：" + time + "毫秒"));
     var notice_3 = document.createElement("P");
-    notice_3.appendChild(document.createTextNode("修改时间间隔"));
+    notice_3.appendChild(document.createTextNode("修改时间间隔，最低5000"));
 
     var input1 = document.createElement("input");
     input1.setAttribute('type', 'text');//输入框的类型
@@ -87,7 +73,6 @@ var cookie = '';
     button1.innerHTML = '修改';
 
     notice.appendChild(notice_0);
-    notice.appendChild(notice_1);
     notice.appendChild(notice_2);
     notice.appendChild(notice_3);
     notice.appendChild(input1);
@@ -96,15 +81,18 @@ var cookie = '';
 
     var container = document.querySelector('body');
     container.appendChild(start);
-    container.appendChild(stop);
     container.appendChild(startAuto);
     container.appendChild(notice);
 
     //绑定点击事件
     button1.onclick = function () {
         time = input1.value;
-        storage.setItem("time", time);
-        notice_2.innerText = "当前时间间隔：" + time + "毫秒";
+        if(time < 5000){
+            alert("不能低于5000毫秒！");
+        }else{
+            storage.setItem("time", time);
+            notice_2.innerText = "当前时间间隔：" + time + "毫秒";
+        }
     };
 
     var flag = true;
@@ -116,13 +104,11 @@ var cookie = '';
              console.log("你按下了Ctrl+Q");
             if(flag == true){
                 start.style.display="none";
-                stop.style.display="none";
                 startAuto.style.display="none";
                 notice.style.display="none";
                 flag = false;
             }else{
                 start.style.display="";
-                stop.style.display="";
                 startAuto.style.display="";
                 notice.style.display="";
                 flag = true;
@@ -133,18 +119,19 @@ var cookie = '';
     }
 
     var auto = null;
-
+    var startFlag = true;
     start.onclick = function() {
-        notice_1.innerText = "当前状态：战斗中";
-        auto = setInterval(function(){
-            startPerilTeamFunc();
-        },time)
-
-    }
-
-    stop.onclick = function() {
-       notice_1.innerText = "当前状态：停止中";
-       clearInterval(auto)
+        if(startFlag){
+            start.innerText = '战斗中,点击暂停';
+            startFlag = false;
+            auto = setInterval(function(){
+                startPerilTeamFunc();
+            },time)
+        }else{
+            start.innerText = '开始战斗';
+            startFlag = true;
+            clearInterval(auto)
+        }
     }
 
     var autoAuto = null;
@@ -172,7 +159,7 @@ function getUserInfo() {
         method: "GET",
         headers: {
             'Cookie': cookie,
-        },
+        }
     }).then(function (response) {
         return response.json()
     }).then(function (res) {
@@ -214,6 +201,7 @@ function getUserGoods() {
                           var goods = res.data[i].goods;
                           if (goods.name === '红药水') {
                               useGoodsToUser(res.data[i]._id);
+                              sleep(1000)
                               redFlag = false;
                           }
                           if (goods.name.indexOf("鉴") > -1) {
@@ -280,6 +268,15 @@ function upgradeUserLevel() {
     }).then(function () {
         console.log('升级成功');
     })
+}
+
+function sleep(n) {
+    var start = new Date().getTime();
+    while (true) {
+        if (new Date().getTime() - start > n) {
+            break;
+        }
+    }
 }
 
 //卖东西
